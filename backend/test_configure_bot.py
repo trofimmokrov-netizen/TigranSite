@@ -22,13 +22,13 @@ class ConfigureTests(unittest.TestCase):
                    'getChatMenuButton': {'type': 'web_app', 'text': 'Услуги и цены',
                                         'web_app': {'url': 'https://example.org/project/miniapp.html'}}}
         api.side_effect = lambda method, payload: answers.get(method, True)
-        result = configure()
+        result = configure(worker_url='')
         self.assertEqual(result['commands'], 8)
         methods = [call.args[0] for call in api.call_args_list]
         self.assertEqual(methods.count('setMyDescription'), 2)
         self.assertIn('setChatMenuButton', methods)
         api.reset_mock()
-        configure(check_only=True)
+        configure(check_only=True, worker_url='')
         self.assertFalse(any(call.args[0].startswith('set') for call in api.call_args_list))
 
     def test_profile_respects_telegram_limits(self):
