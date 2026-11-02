@@ -1,0 +1,11 @@
+[
+  {"id":"phone","name":"Ремонт смартфона","category":"repair","price":null,"note":"Экран, аккумулятор, зарядка, последствия попадания воды. Цена после диагностики."},
+  {"id":"computer","name":"Компьютеры и ноутбуки","category":"repair","price":null,"note":"Mac и PC: неисправности и настройка. Стоимость уточняйте у мастера."},
+  {"id":"film","name":"Гидрогелевая плёнка","category":"protection","price":1000,"note":"Для всех моделей телефонов, 1 шт."},
+  {"id":"glass","name":"Защитное стекло","category":"protection","price":1200,"note":"1 шт. Совместимость уточняйте."},
+  {"id":"privacy-glass","name":"Стекло «Антишпион»","category":"protection","price":1300,"note":"1 шт. Совместимость уточняйте."},
+  {"id":"android-glass","name":"Защитное стекло Android","category":"protection","price":600,"note":"1 шт. Наличие для вашей модели уточняйте."},
+  {"id":"windows","name":"Установка и настройка Windows","category":"software","price":2000,"note":"Условия лицензирования обсуждаются отдельно."},
+  {"id":"office","name":"Установка и настройка Office","category":"software","price":1000,"note":"Условия лицензирования обсуждаются отдельно."},
+  {"id":"print","name":"Копирование и печать А4","category":"print","price":25,"note":"Чёрно-белая, 1 шт. Стоимость цветной печати уточняйте."}
+]
