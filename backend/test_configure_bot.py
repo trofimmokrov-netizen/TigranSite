@@ -25,8 +25,7 @@ class ConfigureTests(unittest.TestCase):
         result = configure(worker_url='')
         self.assertEqual(result['commands'], 8)
         methods = [call.args[0] for call in api.call_args_list]
-        self.assertEqual(methods.count('setMyDescription'), 2)
-        self.assertIn('setChatMenuButton', methods)
+        self.assertFalse(any(method.startswith('set') for method in methods), 'An unchanged profile must not consume Telegram mutation quotas')
         api.reset_mock()
         configure(check_only=True, worker_url='')
         self.assertFalse(any(call.args[0].startswith('set') for call in api.call_args_list))

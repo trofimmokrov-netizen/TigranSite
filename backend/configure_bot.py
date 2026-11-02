@@ -73,23 +73,29 @@ def configure(check_only=False, worker_url=None):
     menu = {'type': 'web_app', 'text': 'Услуги и цены', 'web_app': {'url': miniapp_url}}
     for language in ('', 'ru'):
         common = {'language_code': language}
-        if not check_only:
-            telegram('setMyName', {**common, 'name': NAME})
-            telegram('setMyDescription', {**common, 'description': DESCRIPTION})
-            telegram('setMyShortDescription', {**common, 'short_description': SHORT_DESCRIPTION})
-            telegram('setMyCommands', {**common, 'commands': COMMANDS})
-        expected = [('getMyName', 'name', NAME),
-                    ('getMyDescription', 'description', DESCRIPTION),
-                    ('getMyShortDescription', 'short_description', SHORT_DESCRIPTION)]
-        for method, key, value in expected:
-            if telegram(method, common).get(key) != value:
-                raise RuntimeError(f'Telegram verification failed: {method} ({language or "default"}).')
+        expected = [('getMyName', 'setMyName', 'name', NAME),
+                    ('getMyDescription', 'setMyDescription', 'description', DESCRIPTION),
+                    ('getMyShortDescription', 'setMyShortDescription', 'short_description', SHORT_DESCRIPTION)]
+        for getter, setter, key, value in expected:
+            if telegram(getter, common).get(key) == value:
+                continue
+            if check_only:
+                raise RuntimeError(f'Telegram verification failed: {getter} ({language or "default"}).')
+            telegram(setter, {**common, key: value})
+            if telegram(getter, common).get(key) != value:
+                raise RuntimeError(f'Telegram verification failed: {getter} ({language or "default"}).')
         if telegram('getMyCommands', common) != COMMANDS:
-            raise RuntimeError('Telegram command verification failed.')
-    if not check_only:
-        telegram('setChatMenuButton', {'menu_button': menu})
+            if check_only:
+                raise RuntimeError('Telegram command verification failed.')
+            telegram('setMyCommands', {**common, 'commands': COMMANDS})
+            if telegram('getMyCommands', common) != COMMANDS:
+                raise RuntimeError('Telegram command verification failed.')
     if telegram('getChatMenuButton', {}) != menu:
-        raise RuntimeError('Telegram menu verification failed.')
+        if check_only:
+            raise RuntimeError('Telegram menu verification failed.')
+        telegram('setChatMenuButton', {'menu_button': menu})
+        if telegram('getChatMenuButton', {}) != menu:
+            raise RuntimeError('Telegram menu verification failed.')
     readiness_confirmed = False
     if worker_url is None:
         saved = json.loads((ROOT / 'data/bot-hosting.json').read_text())
