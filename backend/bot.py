@@ -69,7 +69,9 @@ def run():
     if not config()['token']:
         raise SystemExit('Set TELEGRAM_BOT_TOKEN in the environment; never commit it.')
     from configure_bot import configure
-    configure()
+    profile = configure()
+    if profile['webhook_configured']:
+        raise SystemExit('A webhook is configured. Use the hosted webhook service; do not run polling concurrently.')
     offset = 0
     failures = {}
     print('Bot started. Direct contact mode; no customer database.', flush=True)

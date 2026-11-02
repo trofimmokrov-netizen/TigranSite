@@ -34,7 +34,9 @@ def configure(check_only=False):
         telegram('setChatMenuButton', {'menu_button': menu})
     if telegram('getChatMenuButton', {}) != menu:
         raise RuntimeError('Telegram menu verification failed.')
-    return {'username': identity.get('username'), 'miniapp_url': miniapp_url, 'commands': len(COMMANDS)}
+    webhook = telegram('getWebhookInfo', {})
+    return {'username': identity.get('username'), 'miniapp_url': miniapp_url, 'commands': len(COMMANDS),
+            'webhook_configured': bool(webhook.get('url')), 'pending_updates': webhook.get('pending_update_count', 0)}
 
 
 def main():
@@ -49,6 +51,7 @@ def main():
         raise SystemExit(f'Telegram configuration failed ({type(error).__name__}). No credentials printed.') from None
     print(f"Verified @{result['username']}: profile, description, {result['commands']} commands and Mini App menu.")
     print('Mini App URL:', result['miniapp_url'])
+    print('Webhook configured:', result['webhook_configured'], '; pending updates:', result['pending_updates'])
     print('Profile configuration does not start the bot worker. Run backend/bot.py for command replies.')
 
 

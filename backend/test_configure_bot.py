@@ -15,7 +15,7 @@ class ConfigureTests(unittest.TestCase):
     @patch.dict(os.environ, {'TELEGRAM_BOT_TOKEN': 'test-only', 'PUBLIC_URL': 'https://example.org/project'})
     @patch('configure_bot.telegram')
     def test_profile_is_written_and_verified(self, api):
-        answers = {'getMe': {'username': 'test_bot'}, 'getMyName': {'name': NAME},
+        answers = {'getMe': {'username': 'test_bot'}, 'getMyName': {'name': NAME}, 'getWebhookInfo': {'url': '', 'pending_update_count': 0},
                    'getMyDescription': {'description': DESCRIPTION},
                    'getMyShortDescription': {'short_description': SHORT_DESCRIPTION},
                    'getMyCommands': COMMANDS,

@@ -1,5 +1,11 @@
 name: Configure Telegram bot
 on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/configure-telegram.yml
+      - backend/bot_settings.py
+      - backend/configure_bot.py
   workflow_dispatch:
     inputs:
       public_url:
@@ -27,8 +33,8 @@ jobs:
       - name: Configure and verify bot profile
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          PUBLIC_URL: ${{ inputs.public_url }}
-          CHECK_ONLY: ${{ inputs.check_only }}
+          PUBLIC_URL: ${{ inputs.public_url || 'https://trofimmokrov-netizen.github.io/TigranSite' }}
+          CHECK_ONLY: ${{ inputs.check_only || false }}
         run: |
           if [ "$CHECK_ONLY" = "true" ]; then
             python3 backend/configure_bot.py --check
