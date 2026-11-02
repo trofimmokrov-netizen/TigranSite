@@ -6,6 +6,8 @@
 
 Войдите в [Cloudflare Dashboard](https://dash.cloudflare.com/) или зарегистрируйтесь. Откройте **Workers & Pages → Create application / Create Worker**, выберите начальный пример Hello World и опубликуйте Worker. Название можно задать `device-workshop-bot`.
 
+Если уже подключён GitHub-репозиторий, как в созданном Worker **tigransite**, вставлять код вручную не нужно. Конфигурация `wrangler.jsonc` использует имя `tigransite`, файл `deploy/worker.mjs` и включает `workers.dev`. Дождитесь успешной production-сборки. Если требуется указать команду публикации — `npx wrangler deploy`, корень проекта — корень репозитория. После успешной публикации ожидаемый адрес созданного Worker: `https://tigransite.trofimmokrov.workers.dev`.
+
 Откройте **Edit code**, полностью замените начальный код содержимым файла:
 
 [deploy/worker.mjs — открыть на GitHub](https://github.com/trofimmokrov-netizen/TigranSite/blob/main/deploy/worker.mjs)

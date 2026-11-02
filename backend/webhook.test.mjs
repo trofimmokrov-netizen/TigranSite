@@ -52,3 +52,8 @@ test('single-file worker derives header secret and accepts a probe without sendi
   assert.equal(result.status, 200);
   assert.equal((await worker.fetch(request({ update_id: 0 }, 'wrong'), { TELEGRAM_BOT_TOKEN: 'test-only' })).status, 403);
 });
+test('opening Worker URL redirects a visitor to the workshop website', async () => {
+  const response = await worker.fetch(new Request('https://example.org/'), {});
+  assert.equal(response.status, 302);
+  assert.equal(response.headers.get('Location'), 'https://trofimmokrov-netizen.github.io/TigranSite/');
+});

@@ -1,5 +1,6 @@
 {
-  "name": "device-workshop-bot",
+  "name": "tigransite",
   "main": "deploy/worker.mjs",
+  "workers_dev": true,
   "compatibility_date": "2026-01-01"
 }

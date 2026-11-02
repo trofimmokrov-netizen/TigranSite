@@ -164,6 +164,7 @@ export async function webhook(request, env, apiOverride) {
 export default {
   async fetch(request, env) {
     const path = new URL(request.url).pathname;
+    if (path === '/' && request.method === 'GET') return Response.redirect((env.PUBLIC_URL || DEFAULT_URL).replace(/\/$/, '') + '/', 302);
     if (path === '/health') return json({ ok: true, service: 'device-workshop-bot', configured: Boolean(env.TELEGRAM_BOT_TOKEN) });
     if (path === '/telegram/webhook') {
       const secret = env.TELEGRAM_WEBHOOK_SECRET || (env.TELEGRAM_BOT_TOKEN ? await webhookSecret(env.TELEGRAM_BOT_TOKEN) : '');
