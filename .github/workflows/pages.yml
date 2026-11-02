@@ -22,7 +22,7 @@ jobs:
       - name: Prepare static website
         run: |
           mkdir _site
-          cp index.html styles.css layout.css extra.css app.js miniapp.html miniapp.js articles.html privacy.html _site/
+          cp index.html styles.css layout.css extra.css presentation.css app.js motion.js gallery.js miniapp.html miniapp.js articles.html privacy.html sitemap.xml robots.txt _site/
           cp -R assets _site/
           mkdir _site/data
           cp data/services.json _site/data/

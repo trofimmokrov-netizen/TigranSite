@@ -20,9 +20,9 @@ with sync_playwright() as p:
     page.locator('#mobile-nav a[href="#services"]').click()
     expect(page.locator('#mobile-nav')).to_be_hidden()
     page.locator('.hero-actions [data-book]').click()
-    expect(page.locator('dialog')).to_be_visible()
+    expect(page.locator('#booking-dialog')).to_be_visible()
     page.keyboard.press('Escape')
-    expect(page.locator('dialog')).to_be_hidden()
+    expect(page.locator('#booking-dialog')).to_be_hidden()
     for width in (320, 390, 768, 1440):
         page.set_viewport_size({'width': width, 'height': 900})
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Overflow at {width}'
@@ -47,7 +47,7 @@ with sync_playwright() as p:
         page.goto(BASE + '/' + name, wait_until='networkidle')
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), name
     page.goto(BASE + '/articles.html')
-    expect(page.locator('article')).to_have_count(4)
+    expect(page.locator('article')).to_have_count(8)
     assert not errors, errors
     browser.close()
 print('PASS: mobile navigation, dialog, cookie preference, responsive widths, catalog, Telegram draft, articles, privacy; no JavaScript errors')

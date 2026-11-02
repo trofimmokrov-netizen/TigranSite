@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://trofimmokrov-netizen.github.io/TigranSite/sitemap.xml

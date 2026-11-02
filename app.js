@@ -44,17 +44,3 @@ document.querySelector('#cookie-dismiss').addEventListener('click', () => {
   cookieNotice.hidden = true;
 });
 
-if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.07 });
-  document.querySelectorAll('.section-heading, .service-card, .price-panel, .about-grid, .review-card, .award-card, .contact-card').forEach(element => {
-    element.classList.add('reveal');
-    observer.observe(element);
-  });
-}
