@@ -4,6 +4,11 @@ import services from '../data/services.json' with { type: 'json' };
 
 const CONTACT = 'https://t.me/DeviceWorkshop';
 const DEFAULT_URL = 'https://trofimmokrov-netizen.github.io/TigranSite';
+export async function webhookSecret(token) {
+  const bytes = new TextEncoder().encode('device-workshop:webhook:v1:' + token);
+  const hash = await crypto.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(hash), n => n.toString(16).padStart(2, '0')).join('');
+}
 const CONTACTS = 'Москва, проспект Куприна, 34, корпус 2\nЕжедневно 10:00–20:00\n+7 977 997-76-77\nМастер: @DeviceWorkshop';
 const json = (data, status = 200) => new Response(JSON.stringify(data), {
   status, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }
@@ -92,10 +97,13 @@ export async function webhook(request, env, apiOverride) {
 }
 
 export default {
-  fetch(request, env) {
+  async fetch(request, env) {
     const path = new URL(request.url).pathname;
-    if (path === '/health') return json({ ok: true, service: 'device-workshop-bot' });
-    if (path === '/telegram/webhook') return webhook(request, env);
+    if (path === '/health') return json({ ok: true, service: 'device-workshop-bot', configured: Boolean(env.TELEGRAM_BOT_TOKEN) });
+    if (path === '/telegram/webhook') {
+      const secret = env.TELEGRAM_WEBHOOK_SECRET || (env.TELEGRAM_BOT_TOKEN ? await webhookSecret(env.TELEGRAM_BOT_TOKEN) : '');
+      return webhook(request, { ...env, TELEGRAM_WEBHOOK_SECRET: secret });
+    }
     return json({ error: 'Not found' }, 404);
   }
 };

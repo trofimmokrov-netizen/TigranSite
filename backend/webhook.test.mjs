@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import worker, { webhook, handleUpdate, content } from './webhook.mjs';
+import worker, { webhook, handleUpdate, content, webhookSecret } from './webhook.mjs';
 const env = { TELEGRAM_BOT_TOKEN: 'test-only', TELEGRAM_WEBHOOK_SECRET: 'a'.repeat(40) };
 const update = { update_id: 1, message: { chat: { id: 42, type: 'private' }, from: { id: 42 }, text: '/start' } };
 function request(body, secret = env.TELEGRAM_WEBHOOK_SECRET) {
@@ -39,5 +39,16 @@ test('temporary failures ask Telegram to retry and health exposes no secrets', a
   assert.equal((await webhook(request(update), env, async () => { throw new Error('offline'); })).status, 503);
   const health = await worker.fetch(new Request('https://example.org/health'), env);
   assert.equal(health.status, 200);
-  assert.deepEqual(await health.json(), { ok: true, service: 'device-workshop-bot' });
+  assert.deepEqual(await health.json(), { ok: true, service: 'device-workshop-bot', configured: true });
+});
+test('single-file worker derives header secret and accepts a probe without sending a message', async () => {
+  const secret = await webhookSecret(env.TELEGRAM_BOT_TOKEN);
+  assert.match(secret, /^[a-f0-9]{64}$/);
+  const probe = new Request('https://example.org/telegram/webhook', {
+    method: 'POST', headers: { 'X-Telegram-Bot-Api-Secret-Token': secret },
+    body: JSON.stringify({ update_id: 0 })
+  });
+  const result = await worker.fetch(probe, { TELEGRAM_BOT_TOKEN: env.TELEGRAM_BOT_TOKEN });
+  assert.equal(result.status, 200);
+  assert.equal((await worker.fetch(request({ update_id: 0 }, 'wrong'), { TELEGRAM_BOT_TOKEN: 'test-only' })).status, 403);
 });

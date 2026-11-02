@@ -6,6 +6,7 @@ on:
       - .github/workflows/configure-telegram.yml
       - backend/bot_settings.py
       - backend/configure_bot.py
+      - data/bot-hosting.json
   workflow_dispatch:
     inputs:
       public_url:
@@ -16,6 +17,9 @@ on:
         description: Only verify current settings
         type: boolean
         default: false
+      worker_url:
+        description: Published Cloudflare Worker URL (optional; connects the bot)
+        required: false
 permissions:
   contents: read
 concurrency:
@@ -35,6 +39,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           PUBLIC_URL: ${{ inputs.public_url || 'https://trofimmokrov-netizen.github.io/TigranSite' }}
           CHECK_ONLY: ${{ inputs.check_only || false }}
+          BOT_WORKER_URL: ${{ inputs.worker_url }}
         run: |
           if [ "$CHECK_ONLY" = "true" ]; then
             python3 backend/configure_bot.py --check

@@ -1,0 +1,5 @@
+{
+  "name": "device-workshop-bot",
+  "main": "deploy/worker.mjs",
+  "compatibility_date": "2026-01-01"
+}
