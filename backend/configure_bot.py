@@ -5,6 +5,7 @@ import json
 import os
 from urllib.parse import urlsplit
 from urllib.request import Request, build_opener, HTTPRedirectHandler
+from urllib.error import HTTPError, URLError
 from common import ROOT, config, telegram
 from bot_settings import COMMANDS, NAME, DESCRIPTION, SHORT_DESCRIPTION
 
@@ -15,11 +16,25 @@ class NoRedirect(HTTPRedirectHandler):
 
 
 def read_worker_json(request):
-    with build_opener(NoRedirect).open(request, timeout=20) as response:
-        raw = response.read(65537)
+    endpoint = urlsplit(request.full_url).path
+    try:
+        with build_opener(NoRedirect).open(request, timeout=20) as response:
+            raw = response.read(65537)
+    except HTTPError as error:
+        raise ValueError(f'Worker {endpoint} returned HTTP {error.code}. Check the public address and Worker secret configuration.') from None
+    except URLError:
+        raise ValueError(f'Worker {endpoint} is unreachable. Check that production deployment and workers.dev are enabled.') from None
     if len(raw) > 65536:
         raise ValueError('Worker response is too large.')
     return json.loads(raw)
+
+
+def fail(message):
+    # Only call with our own safe diagnostics, never raw HTTP exceptions.
+    if os.environ.get('GITHUB_ACTIONS') == 'true':
+        safe = message.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+        print('::error title=Telegram bot setup::' + safe, flush=True)
+    raise SystemExit(message)
 
 
 def connect_worker(worker_url, token, check_only=False):
@@ -91,9 +106,9 @@ def main():
     try:
         result = configure(check_only=args.check, worker_url=args.worker_url)
     except ValueError as error:
-        raise SystemExit(str(error)) from None
+        fail(str(error))
     except Exception as error:
-        raise SystemExit(f'Telegram configuration failed ({type(error).__name__}). No credentials printed.') from None
+        fail(f'Telegram configuration failed ({type(error).__name__}). No credentials printed.')
     print(f"Verified @{result['username']}: profile, description, {result['commands']} commands and Mini App menu.")
     print('Mini App URL:', result['miniapp_url'])
     print('Webhook configured:', result['webhook_configured'], '; pending updates:', result['pending_updates'])
