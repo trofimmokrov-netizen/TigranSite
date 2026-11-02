@@ -142,6 +142,8 @@ def main():
     except Exception as error:
         fail(f'Telegram configuration failed ({type(error).__name__}). No credentials printed.')
     print(f"Verified @{result['username']}: profile, description, {result['commands']} commands and Mini App menu.")
+    if os.environ.get('GITHUB_ACTIONS') == 'true':
+        print('::notice title=Telegram public profile::Bot @' + result['username'], flush=True)
     print('Mini App URL:', result['miniapp_url'])
     print('Webhook configured:', result['webhook_configured'], '; pending updates:', result['pending_updates'])
     if result['webhook_configured']:
