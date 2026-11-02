@@ -1,17 +1,8 @@
 """Telegram assistant for the static site. Run on a computer or server, not Pages."""
 import time
 from common import SERVICES, config, telegram
+from bot_settings import COMMANDS
 
-COMMANDS = [
-    {'command': 'start', 'description': 'Главное меню'},
-    {'command': 'repair', 'description': 'Выбрать услугу и написать мастеру'},
-    {'command': 'prices', 'description': 'Услуги и цены'},
-    {'command': 'print', 'description': 'Копирование и печать А4'},
-    {'command': 'contacts', 'description': 'Телефон, адрес и маршрут'},
-    {'command': 'hours', 'description': 'Время работы'},
-    {'command': 'site', 'description': 'Сайт и полезные статьи'},
-    {'command': 'help', 'description': 'Как обратиться в мастерскую'},
-]
 CONTACTS = ('Москва, проспект Куприна, 34, корпус 2\n'
             'Ежедневно 10:00–20:00\n+7 977 997-76-77\nМастер: @DeviceWorkshop')
 
@@ -77,12 +68,8 @@ def handle_update(update):
 def run():
     if not config()['token']:
         raise SystemExit('Set TELEGRAM_BOT_TOKEN in the environment; never commit it.')
-    telegram('getMe', {})
-    telegram('setMyCommands', {'commands': COMMANDS, 'language_code': 'ru'})
-    telegram('setMyCommands', {'commands': COMMANDS})
-    url = config()['public_url']
-    if url.startswith('https://'):
-        telegram('setChatMenuButton', {'menu_button': {'type': 'web_app', 'text': 'Услуги и заявка', 'web_app': {'url': url + '/miniapp.html'}}})
+    from configure_bot import configure
+    configure()
     offset = 0
     failures = {}
     print('Bot started. Direct contact mode; no customer database.', flush=True)

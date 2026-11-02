@@ -1,0 +1,37 @@
+name: Configure Telegram bot
+on:
+  workflow_dispatch:
+    inputs:
+      public_url:
+        description: Published HTTPS site URL, including /TigranSite
+        required: true
+        default: https://trofimmokrov-netizen.github.io/TigranSite
+      check_only:
+        description: Only verify current settings
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: telegram-profile
+  cancel-in-progress: false
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Configure and verify bot profile
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          PUBLIC_URL: ${{ inputs.public_url }}
+          CHECK_ONLY: ${{ inputs.check_only }}
+        run: |
+          if [ "$CHECK_ONLY" = "true" ]; then
+            python3 backend/configure_bot.py --check
+          else
+            python3 backend/configure_bot.py
+          fi
