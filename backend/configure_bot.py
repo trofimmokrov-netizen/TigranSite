@@ -7,7 +7,7 @@ import time
 from urllib.parse import urlsplit
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 from urllib.error import HTTPError, URLError
-from common import ROOT, config, telegram
+from common import ROOT, config, telegram, TelegramAPIError
 from bot_settings import COMMANDS, NAME, DESCRIPTION, SHORT_DESCRIPTION
 
 
@@ -130,6 +130,8 @@ def main():
     try:
         result = configure(check_only=args.check, worker_url=args.worker_url)
     except ValueError as error:
+        fail(str(error))
+    except TelegramAPIError as error:
         fail(str(error))
     except Exception as error:
         fail(f'Telegram configuration failed ({type(error).__name__}). No credentials printed.')
