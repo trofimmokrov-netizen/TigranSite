@@ -1,3 +1,4 @@
 {
-  "worker_url": "https://tigransite.trofimmokrov.workers.dev/"
+  "worker_url": "https://tigransite.trofimmokrov.workers.dev/",
+  "owner_confirmed_ready": true
 }

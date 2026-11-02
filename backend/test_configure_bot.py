@@ -55,5 +55,13 @@ class ConfigureTests(unittest.TestCase):
         with self.assertRaises(ValueError): connect_worker('https://test.example', 'test-only')
         api.assert_not_called()
 
+    @patch('configure_bot.telegram')
+    @patch('configure_bot.read_worker_json')
+    def test_owner_confirmed_readiness_connects_through_telegram(self, read, api):
+        target = connect_worker('https://test.example', 'test-only', readiness_confirmed=True)
+        read.assert_not_called()
+        self.assertEqual(api.call_args.args[0], 'setWebhook')
+        self.assertEqual(api.call_args.args[1]['url'], target)
+
 
 if __name__ == '__main__': unittest.main()
