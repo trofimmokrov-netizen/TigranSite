@@ -11,7 +11,7 @@ with sync_playwright() as p:
     errors = []
     page.on('pageerror', lambda error: errors.append(str(error)))
     page.goto(BASE, wait_until='networkidle')
-    expect(page.locator('h1')).to_contain_text('Ваша техника')
+    expect(page.locator('h1')).to_contain_text('Ремонт')
     page.locator('#cookie-dismiss').click()
     page.reload()
     expect(page.locator('#cookie-notice')).to_be_hidden()
