@@ -1,6 +1,7 @@
 // Fetch-compatible webhook handler for a hosted service (Sites/Workers).
 // Secrets belong in that service's environment, never in the static site.
 import services from '../data/services.json' with { type: 'json' };
+import { accountAPI } from './account.mjs';
 
 const CONTACT = 'https://t.me/DeviceWorkshop';
 const DEFAULT_URL = 'https://trofimmokrov-netizen.github.io/TigranSite';
@@ -18,6 +19,7 @@ export function keyboard(env) {
   const base = (env.PUBLIC_URL || DEFAULT_URL).replace(/\/$/, '');
   return { inline_keyboard: [
     [{ text: 'Услуги и цены', web_app: { url: base + '/miniapp.html' } }],
+    [{ text: 'Личный кабинет', web_app: { url: base + '/account.html' } }],
     [{ text: 'Цены', callback_data: 'prices' }, { text: 'Контакты', callback_data: 'contacts' }],
     [{ text: 'Написать мастеру', url: CONTACT }],
     [{ text: 'Маршрут', url: 'https://yandex.ru/maps/org/device_workshop/223528800071/' }]
@@ -71,7 +73,12 @@ export async function handleUpdate(update, env, api) {
   } else {
     command = message.text?.match(/^\/([a-z_]+)(?:@[a-z0-9_]+)?(?:\s|$)/i)?.[1]?.toLowerCase() || 'unknown';
   }
-  await api('sendMessage', { chat_id: message.chat.id, text: content(command, env), reply_markup: keyboard(env) });
+  const markup = keyboard(env);
+  const accountStart = !callback && /^\/start(?:@[a-z0-9_]+)?\s+account(?:\s|$)/i.test(message.text || '');
+  if (accountStart) markup.inline_keyboard.unshift(...markup.inline_keyboard.splice(1, 1));
+  await api('sendMessage', { chat_id: message.chat.id,
+    text: accountStart ? 'Личный кабинет Device Workshop\n\nОткройте кабинет кнопкой ниже. Telegram подтвердит ваш профиль. В кабинете можно подготовить и сохранить черновик обращения на текущем устройстве, затем отправить сообщение мастеру.' : content(command, env),
+    reply_markup: markup });
 }
 
 export async function webhook(request, env, apiOverride) {
@@ -99,6 +106,7 @@ export async function webhook(request, env, apiOverride) {
 export default {
   async fetch(request, env) {
     const path = new URL(request.url).pathname;
+    if (path.startsWith('/api/account/')) return accountAPI(request, env);
     if (path === '/' && request.method === 'GET') return Response.redirect((env.PUBLIC_URL || DEFAULT_URL).replace(/\/$/, '') + '/', 302);
     if (path === '/health') return json({ ok: true, service: 'device-workshop-bot', configured: Boolean(env.TELEGRAM_BOT_TOKEN) });
     if (path === '/telegram/webhook') {

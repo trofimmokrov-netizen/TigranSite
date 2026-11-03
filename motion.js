@@ -83,6 +83,10 @@ reduceMotion.addEventListener('change', () => {
 document.querySelectorAll('.hero-copy > *').forEach((element, index) => enter(element, index * 85));
 if (document.querySelector('.hero-art')) enter(document.querySelector('.hero-art'), 180);
 if ('IntersectionObserver' in window) {
+  const diagramObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+    entry.target.toggleAttribute('data-offscreen', !entry.isIntersecting);
+  }), { rootMargin: '100px' });
+  document.querySelectorAll('.live-diagram').forEach(element => diagramObserver.observe(element));
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;

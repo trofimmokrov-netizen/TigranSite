@@ -57,3 +57,9 @@ test('opening Worker URL redirects a visitor to the workshop website', async () 
   assert.equal(response.status, 302);
   assert.equal(response.headers.get('Location'), 'https://trofimmokrov-netizen.github.io/TigranSite/');
 });
+test('account deep link places the verified Mini App account entry first', async () => {
+  const calls = [];
+  await handleUpdate({ ...update, message: { ...update.message, text: '/start account' } }, env, async (method, payload) => calls.push(payload));
+  assert.match(calls[0].reply_markup.inline_keyboard[0][0].web_app.url, /\/account.html$/);
+  assert.match(calls[0].text, /Личный кабинет/);
+});

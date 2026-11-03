@@ -29,7 +29,7 @@ with sync_playwright() as p:
     page.locator('.promo-grid a').first.click()
     expect(page.locator('.gallery-count')).to_have_text('3 / 8')
     page.locator('.gallery-close').click()
-    for width in (320, 390, 768, 1024, 1440):
+    for width in (320, 390, 768, 1024, 1120, 1200, 1440):
         page.set_viewport_size({'width': width, 'height': 900})
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Homepage overflow at {width}'
     page.set_viewport_size({'width': 390, 'height': 844})
